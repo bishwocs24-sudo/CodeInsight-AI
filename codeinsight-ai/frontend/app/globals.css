@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+.dark {
+  /* Deep blue-black, like a code editor's dark theme - not pure black */
+  --background: 222 26% 7%;
+  --foreground: 210 20% 92%;
+  --card: 222 22% 10%;
+  --border: 222 15% 19%;
+  --muted: 222 17% 14%;
+  --muted-foreground: 218 10% 63%;
+
+  /* Amber - the color a compiler uses for a warning, doing double duty
+     as this product's signature accent */
+  --primary: 38 92% 58%;
+  --primary-foreground: 222 26% 9%;
+
+  /* Teal-green - the color a linter uses for "passing" */
+  --accent: 168 68% 45%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.font-display {
+  font-family: var(--font-display), ui-monospace, "SFMono-Regular", monospace;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: hsl(var(--primary) / 0.35);
+}
+
+/* Visible keyboard focus everywhere - accessibility floor, not optional */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
