@@ -25,6 +25,7 @@ export default function LoginPage() {
   const [options, setOptions] = useState<AuthOptions | null>(null);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") return;
     getAuthOptions().then(setOptions).catch(() => {});
   }, []);
 
@@ -40,6 +41,16 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") {
+    return (
+      <main className="queue-workspace flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
+        <h1 className="text-2xl font-semibold">CodeGuard sample demo</h1>
+        <p className="text-sm text-slate-400">This deployment serves the public sample review.</p>
+        <Link href="/demo" className="queue-primary">Try sample review</Link>
+      </main>
+    );
   }
 
   return (

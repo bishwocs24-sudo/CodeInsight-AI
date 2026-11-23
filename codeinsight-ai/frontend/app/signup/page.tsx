@@ -40,6 +40,16 @@ export default function SignupPage() {
     }
   }
 
+  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") {
+    return (
+      <main className="queue-workspace flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
+        <h1 className="text-2xl font-semibold">CodeGuard sample demo</h1>
+        <p className="text-sm text-slate-400">This deployment serves the public sample review.</p>
+        <Link href="/demo" className="queue-primary">Try sample review</Link>
+      </main>
+    );
+  }
+
   return (
     <main className="relative flex min-h-screen items-center justify-center px-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,hsl(var(--primary)/0.12),transparent)]" />

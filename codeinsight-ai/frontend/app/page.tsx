@@ -26,7 +26,7 @@ export default function LandingPage() {
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <ShieldCheck className="text-teal-300" size={21} aria-hidden /> CodeGuard AI
         </Link>
-        <Link href="/login" className="queue-secondary">Sign in</Link>
+        {process.env.NEXT_PUBLIC_DEMO_ONLY !== "1" && <Link href="/login" className="queue-secondary">Sign in</Link>}
       </nav>
 
       <section className="release-hero mt-8 rounded-2xl border">
