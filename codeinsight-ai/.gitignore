@@ -13,3 +13,6 @@ node_modules/
 celerybeat-schedule*
 *.pem
 frontend/out/
+
+# Self-hosted production secrets
+deploy/free.env

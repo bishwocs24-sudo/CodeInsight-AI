@@ -1,0 +1,136 @@
+name: codeguard-free
+
+x-runtime: &runtime
+  PRODUCTION: "true"
+  SIGNUP_ENABLED: "false"
+  SANDBOX_ENABLED: "false"
+  PR_AI_ENABLED: "${PR_AI_ENABLED:-false}"
+  GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
+  GOOGLE_MODEL: "${GOOGLE_MODEL:-gemini-flash-latest}"
+  GITHUB_APP_ID: "${GITHUB_APP_ID:-}"
+  GITHUB_APP_PRIVATE_KEY_FILE: "${GITHUB_APP_PRIVATE_KEY_FILE:-}"
+  GITHUB_WEBHOOK_SECRET: "${GITHUB_WEBHOOK_SECRET:-}"
+  GITHUB_REVIEW_OWNER_ID: "${GITHUB_REVIEW_OWNER_ID:-}"
+  GITHUB_ALLOWED_INSTALLATIONS: "${GITHUB_ALLOWED_INSTALLATIONS:-}"
+  GITHUB_PUBLISH_REVIEWS: "${GITHUB_PUBLISH_REVIEWS:-false}"
+  JWT_SECRET_KEY: "${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in deploy/free.env}"
+  FRONTEND_ORIGIN: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME in deploy/free.env}"
+  FRONTEND_AUTH_CALLBACK_URL: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME}/auth/callback"
+  GITHUB_OAUTH_REDIRECT_URI: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME}/auth/github/callback"
+  DATABASE_URL: "postgresql://codeguard:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/free.env}@db:5432/codeguard"
+  REDIS_URL: "redis://redis:6379/0"
+
+x-web-image: &web-image
+  build: .
+  image: codeguard-web:local
+
+x-worker-image: &worker-image
+  build:
+    context: .
+    dockerfile: Dockerfile.worker
+  image: codeguard-worker:local
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: codeguard
+      POSTGRES_DB: codeguard
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/free.env}"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "codeguard", "-d", "codeguard"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  migrate:
+    <<: *web-image
+    command: ["alembic", "upgrade", "head"]
+    environment: *runtime
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *web-image
+    restart: unless-stopped
+    environment:
+      <<: *runtime
+      FORWARDED_ALLOW_IPS: "172.30.191.2"
+    networks:
+      default: {}
+      ingress: {}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/ready', timeout=3).close()"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+
+  worker:
+    <<: *worker-image
+    restart: unless-stopped
+    stop_grace_period: 240s
+    environment: *runtime
+    depends_on:
+      web:
+        condition: service_healthy
+
+  scheduler:
+    <<: *worker-image
+    restart: unless-stopped
+    environment: *runtime
+    command: ["celery", "-A", "app.platform_review.worker:celery", "beat", "--loglevel=INFO", "--schedule=/tmp/codeguard-beat"]
+    depends_on:
+      web:
+        condition: service_healthy
+
+  https:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_HOSTNAME: "${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME in deploy/free.env}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      ingress:
+        ipv4_address: 172.30.191.2
+    depends_on:
+      web:
+        condition: service_healthy
+
+networks:
+  ingress:
+    ipam:
+      config:
+        - subnet: 172.30.191.0/29
+
+volumes:
+  postgres:
+  redis:
+  caddy_data:
+  caddy_config:

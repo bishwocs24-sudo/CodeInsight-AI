@@ -10,3 +10,5 @@
 **/.env.local
 **/*.pem
 **/*.db
+
+**/free.env

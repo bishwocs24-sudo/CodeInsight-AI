@@ -1,6 +1,6 @@
 # CodeGuard AI
 
-The asynchronous review queue adds GitHub App pull request reviews, Semgrep, evidence-validated AI suggestions, feedback, SARIF export, and optional isolated Python tests. See [Review automation](docs/REVIEW_AUTOMATION.md) for startup, configuration, migrations, and verification. See [Render deployment](docs/RENDER_DEPLOYMENT.md) for the full hosted stack.
+The asynchronous review queue adds GitHub App pull request reviews, Semgrep, evidence-validated AI suggestions, feedback, SARIF export, and optional isolated Python tests. See [Review automation](docs/REVIEW_AUTOMATION.md) for startup, configuration, migrations, and verification. See [self-hosting at no hosting cost](docs/FREE_DEPLOYMENT.md) for the full stack on a single Linux VM.
 
 Select **Try sample review** from the homepage to explore a recorded Semgrep scan, triage a finding, and download SARIF without an account. The replay uses a fixed snippet and runs entirely in the browser.
 
