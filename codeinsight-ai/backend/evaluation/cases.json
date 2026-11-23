@@ -1,0 +1,58 @@
+[
+  {
+    "case": "mutable Python default",
+    "path": "helpers.py",
+    "code": "def items(values=[]):\n    return values\n",
+    "added": [1, 2],
+    "expected": [1]
+  },
+  {
+    "case": "safe Python default",
+    "path": "helpers.py",
+    "code": "def items(values=None):\n    return [] if values is None else values\n",
+    "added": [1, 2],
+    "expected": []
+  },
+  {
+    "case": "bare exception handler",
+    "path": "helpers.py",
+    "code": "try:\n    parse()\nexcept:\n    pass\n",
+    "added": [3, 4],
+    "expected": [3]
+  },
+  {
+    "case": "unchanged Python warning",
+    "path": "helpers.py",
+    "code": "def items(values=[]):\n    return values\n\nlabel = 'items'\n",
+    "added": [4],
+    "expected": []
+  },
+  {
+    "case": "loose JavaScript equality",
+    "path": "compare.js",
+    "code": "const same = (left, right) => left == right;\n",
+    "added": [1],
+    "expected": [1]
+  },
+  {
+    "case": "strict JavaScript equality",
+    "path": "compare.js",
+    "code": "const same = (left, right) => left === right;\n",
+    "added": [1],
+    "expected": []
+  },
+  {
+    "case": "C safe buffer read",
+    "path": "io.c",
+    "code": "void read(char *out, int size) { fgets(out, size, stdin); }\n",
+    "added": [1],
+    "expected": []
+  },
+  {
+    "case": "C deprecated unbounded input",
+    "path": "io.c",
+    "code": "void read(char *out) { gets(out); }\n",
+    "added": [1],
+    "expected": [1]
+  }
+]

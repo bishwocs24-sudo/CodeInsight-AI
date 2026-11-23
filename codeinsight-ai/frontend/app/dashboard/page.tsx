@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FilePlus2 } from "lucide-react";
+import { FilePlus2, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAnalytics } from "@/lib/api";
@@ -31,6 +31,11 @@ export default function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      <Link href="/dashboard/review-queue" className="mb-6 flex max-w-xl items-center gap-3 rounded-xl border border-teal-800 bg-teal-950/30 p-4 hover:bg-teal-950/60">
+        <ScanLine className="h-5 w-5 shrink-0 text-teal-300" />
+        <span><strong className="block text-sm">Review queue</strong><span className="text-xs text-muted-foreground">Open automated pull request and snippet reviews</span></span>
+      </Link>
 
       {error && (
         <Card className="mb-6 border-red-500/30">

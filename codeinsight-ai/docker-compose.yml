@@ -7,9 +7,19 @@ services:
       POSTGRES_PASSWORD: codeinsight
       POSTGRES_DB: codeinsight
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - codeinsight_pgdata:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - codeguard_redisdata:/data
+
 volumes:
+  codeguard_redisdata:
   codeinsight_pgdata:

@@ -47,7 +47,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(body.detail ?? `Request failed (${res.status})`, res.status);
+    const message = typeof body.detail === "string" ? body.detail
+      : Array.isArray(body.detail) ? body.detail.map((item: { msg: string }) => item.msg).join(". ")
+      : `Request failed (${res.status})`;
+    throw new ApiError(message, res.status);
   }
   return res.json() as Promise<T>;
 }
@@ -64,6 +67,12 @@ export function login(email: string, password: string): Promise<AuthResponse> {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+}
+
+export type AuthOptions = { signup: boolean; github: boolean };
+
+export function getAuthOptions(): Promise<AuthOptions> {
+  return request<AuthOptions>("/auth/options");
 }
 
 export function getMe(): Promise<AppUser> {
@@ -166,3 +175,74 @@ export async function downloadReviewPdf(reviewId: string): Promise<void> {
 }
 
 export { ApiError };
+
+export type JobStatus = "queued" | "running" | "publishing" | "completed" | "failed" | "cancelled" | "superseded";
+export type FindingVerdict = "confirmed" | "false_positive" | "clear";
+
+export interface AutomationFinding {
+  id: number;
+  source: "semgrep" | "static" | "ai";
+  rule_id: string;
+  path: string;
+  line: number;
+  severity: "high" | "medium" | "low";
+  message: string;
+  evidence_sha256: string;
+  suppressed: boolean;
+  verdict: FindingVerdict | null;
+}
+
+export interface AutomationJob {
+  id: string;
+  status: JobStatus;
+  attempts: number;
+  created_at: string;
+  updated_at: string;
+  repository: string | null;
+  pull_number: number | null;
+  head_sha: string | null;
+  error: string | null;
+  result: {
+    files_reviewed: number;
+    files_skipped: number;
+    semgrep: string;
+    ai: string;
+    ruleset: string;
+    duration_ms: number;
+    verification?: { status: string };
+    publication?: string;
+    findings_truncated: boolean;
+  } | null;
+}
+
+export type AutomationJobDetail = AutomationJob & { findings: AutomationFinding[] };
+
+export const getAutomationJobs = () => request<AutomationJob[]>("/automation/jobs");
+export const getAutomationJob = (id: string) => request<AutomationJobDetail>(`/automation/jobs/${id}`);
+export const getAutomationCapabilities = () => request<{ sandbox: boolean; ai: boolean }>("/automation/capabilities");
+
+export function queueReview(language: string, code: string, tests?: string) {
+  return request<{ id: string; status: JobStatus }>("/automation/jobs", {
+    method: "POST", body: JSON.stringify({ language, code, tests }),
+  });
+}
+
+export function cancelAutomationJob(id: string) {
+  return request(`/automation/jobs/${id}/cancel`, { method: "POST" });
+}
+
+export function submitFindingFeedback(job: string, finding: number, verdict: FindingVerdict) {
+  return request(`/automation/jobs/${job}/findings/${finding}/feedback`, {
+    method: "PUT", body: JSON.stringify({ verdict }),
+  });
+}
+
+export async function exportAutomationJob(id: string) {
+  const data = await request<unknown>(`/automation/jobs/${id}/sarif`);
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/sarif+json" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `codeguard-${id}.sarif`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

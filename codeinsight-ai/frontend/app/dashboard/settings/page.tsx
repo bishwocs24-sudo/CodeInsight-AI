@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export default function SettingsPage() {
   const { logout } = useAuth();
+  const router = useRouter();
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export default function SettingsPage() {
     try {
       await deleteAccount();
       logout();
-      window.location.href = "/";
+      router.replace("/");
     } catch {
       setError("Couldn't delete account data.");
       setDeleting(false);
@@ -77,7 +79,7 @@ export default function SettingsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">Preferences for how CodeInsight AI behaves.</p>
+          <p className="text-sm text-muted-foreground">Preferences for how CodeGuard AI behaves.</p>
         </div>
         {saving && <span className="text-xs text-muted-foreground">Saving…</span>}
       </div>
@@ -88,7 +90,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm">Dark mode</p>
-              <p className="text-xs text-muted-foreground">CodeInsight AI is dark-mode-first by design.</p>
+              <p className="text-xs text-muted-foreground">CodeGuard AI is dark-mode-first by design.</p>
             </div>
             <Toggle checked={settings.dark_mode} onChange={(v) => patch({ dark_mode: v })} />
           </div>

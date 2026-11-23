@@ -15,9 +15,9 @@ const bodyFont = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CodeInsight AI — AI Code Reviews in Seconds",
+  title: "CodeGuard AI — Evidence-Grounded Code Review",
   description:
-    "AI-powered code review, security analysis, and refactoring for developers who ship fast.",
+    "Review snippets and GitHub pull requests with Semgrep, static checks, and line-level evidence.",
 };
 
 export default function RootLayout({

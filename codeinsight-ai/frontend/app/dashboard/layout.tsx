@@ -11,7 +11,8 @@ import {
   BarChart3,
   Settings,
   User,
-  Sparkles,
+  ScanLine,
+  ShieldCheck,
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import { NotificationsMenu } from "@/components/notifications-menu";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/review-queue", label: "Review queue", icon: ScanLine },
   { href: "/dashboard/new-review", label: "New Review", icon: FilePlus2 },
   { href: "/dashboard/history", label: "History", icon: History },
   { href: "/dashboard/github", label: "GitHub", icon: Github },
@@ -49,10 +51,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-60 flex-col border-r border-border px-4 py-6 md:flex">
-        <Link href="/" className="mb-8 flex items-center gap-2 px-2 font-display font-semibold tracking-tight">
-          <Sparkles className="h-5 w-5 text-primary" />
-          CodeInsight AI
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-border px-4 py-6 md:flex">
+        <Link href="/" className="mb-8 font-display flex items-center gap-2 px-2 font-semibold tracking-tight">
+          <ShieldCheck className="h-5 w-5 text-teal-300" />
+          CodeGuard AI
         </Link>
         <nav className="flex flex-1 flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -88,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </Link>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
           <span className="text-sm text-muted-foreground">{user.email}</span>
           <div className="flex items-center gap-2">
@@ -96,7 +98,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <UserMenu email={user.email} />
           </div>
         </header>
-        <main className="flex-1 px-6 py-8 md:px-10">{children}</main>
+        <nav aria-label="Dashboard" className="flex gap-2 overflow-x-auto border-b px-4 py-2 md:hidden">
+          {NAV_ITEMS.map(({ href, label }) => (
+            <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}
+              className={cn("shrink-0 rounded-md px-2 py-1 text-xs", pathname === href && "bg-muted text-teal-200")}>
+              {label}
+            </Link>
+          ))}
+          <Link href="/dashboard/profile" className="shrink-0 rounded-md px-2 py-1 text-xs">Profile</Link>
+        </nav>
+        <main className="flex-1 px-4 py-6 sm:px-6 md:px-8">{children}</main>
       </div>
     </div>
   );

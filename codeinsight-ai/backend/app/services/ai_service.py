@@ -71,7 +71,7 @@ class AIService:
         try:
             response = self._client.post(
                 url,
-                params={"key": self._api_key},
+                headers={"x-goog-api-key": self._api_key},
                 json={
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {
@@ -83,14 +83,16 @@ class AIService:
             )
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
-            logger.exception("Gemini API returned an error status")
-            detail = exc.response.text[:300]
-            raise AIServiceError(f"AI provider request failed ({exc.response.status_code}): {detail}") from exc
-        except Exception as exc:  # network errors, timeouts, etc.
-            logger.exception("Gemini API call failed")
-            raise AIServiceError(f"AI provider request failed: {exc}") from exc
-
-        data = response.json()
+            status = exc.response.status_code
+            logger.warning("Gemini API returned HTTP %s", status)
+            raise AIServiceError(f"AI provider request failed (HTTP {status}).") from exc
+        except httpx.RequestError as exc:
+            logger.warning("Gemini API request failed")
+            raise AIServiceError("AI provider connection failed.") from exc
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise AIServiceError("AI provider returned invalid JSON.") from exc
         raw_text = self._extract_text(data)
         return self._parse_json(raw_text)
 
@@ -102,8 +104,8 @@ class AIService:
                 raise AIServiceError("Gemini returned no candidates - the prompt may have been blocked by safety filters.")
             parts = candidates[0]["content"]["parts"]
             return "".join(p.get("text", "") for p in parts).strip()
-        except (KeyError, IndexError) as exc:
-            logger.error("Unexpected Gemini response shape: %s", data)
+        except (KeyError, IndexError, TypeError, AttributeError) as exc:
+            logger.error("Unexpected Gemini response shape")
             raise AIServiceError("Unexpected response shape from the AI provider.") from exc
 
     @staticmethod
@@ -120,7 +122,7 @@ class AIService:
         try:
             return json.loads(cleaned)
         except json.JSONDecodeError as exc:
-            logger.error("Failed to parse AI response as JSON: %s", raw_text[:500])
+            logger.error("Failed to parse AI response as JSON")
             raise AIServiceError(
                 "AI response was not valid JSON. This usually clears up on retry."
             ) from exc

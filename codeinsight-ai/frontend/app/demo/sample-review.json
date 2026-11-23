@@ -1,0 +1,103 @@
+{
+  "source": "def add_label(label, labels=[]):\n    labels.append(label)\n    return labels\n\n\nfirst = add_label(\"review\")\nsecond = add_label(\"ready\")\n",
+  "path": "labels.py",
+  "scan": {
+    "files_reviewed": 1,
+    "files_skipped": 0,
+    "semgrep": "completed",
+    "semgrep_version": "1.186.0",
+    "ruleset": "154c9ab317525b7c5532d8f160ecf62d44ab5886140b74d303ad09ec5a6cb6bd",
+    "ai": "disabled",
+    "ai_tokens": null,
+    "findings_truncated": false
+  },
+  "findings": [
+    {
+      "source": "semgrep",
+      "rule_id": "python-mutable-default",
+      "path": "labels.py",
+      "line": 1,
+      "severity": "medium",
+      "message": "Initialize mutable defaults inside the function to avoid sharing state.",
+      "fingerprint": "a4cbf367932a31dc725271dd2578f514220cd07faf34b4eec576b72d2c0cb656",
+      "evidence_sha256": "405b19b8df718a4c2d6fa0462c041f0a2a5a77ee8b693ddf1321378c2e632d17",
+      "suppressed": false
+    },
+    {
+      "source": "static",
+      "rule_id": "PY005",
+      "path": "labels.py",
+      "line": 1,
+      "severity": "medium",
+      "message": "Mutable default argument can leak state across calls",
+      "fingerprint": "56b80ed8f7cf58b6b531aba2204da74a27f5c8b71a55361b06d21dce2bde159a",
+      "evidence_sha256": "405b19b8df718a4c2d6fa0462c041f0a2a5a77ee8b693ddf1321378c2e632d17",
+      "suppressed": false
+    }
+  ],
+  "sarif": {
+    "version": "2.1.0",
+    "runs": [
+      {
+        "tool": {
+          "driver": {
+            "name": "CodeGuard AI",
+            "version": "154c9ab317525b7c5532d8f160ecf62d44ab5886140b74d303ad09ec5a6cb6bd"
+          }
+        },
+        "results": [
+          {
+            "ruleId": "python-mutable-default",
+            "level": "warning",
+            "message": {
+              "text": "Initialize mutable defaults inside the function to avoid sharing state."
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "labels.py"
+                  },
+                  "region": {
+                    "startLine": 1
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "primaryLocationLineHash": "405b19b8df718a4c2d6fa0462c041f0a2a5a77ee8b693ddf1321378c2e632d17"
+            },
+            "properties": {
+              "source": "semgrep"
+            }
+          },
+          {
+            "ruleId": "PY005",
+            "level": "warning",
+            "message": {
+              "text": "Mutable default argument can leak state across calls"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "labels.py"
+                  },
+                  "region": {
+                    "startLine": 1
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "primaryLocationLineHash": "405b19b8df718a4c2d6fa0462c041f0a2a5a77ee8b693ddf1321378c2e632d17"
+            },
+            "properties": {
+              "source": "static"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

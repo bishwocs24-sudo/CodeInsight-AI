@@ -1,5 +1,7 @@
 # Deployment
 
+For the complete hosted stack with review workers, use the [Render Blueprint guide](RENDER_DEPLOYMENT.md).
+
 This covers deploying to the stack named in the original spec: Vercel
 (frontend), Render (backend), Neon (Postgres). Each step needs an account
 on that platform — nothing here can be done without you creating them.

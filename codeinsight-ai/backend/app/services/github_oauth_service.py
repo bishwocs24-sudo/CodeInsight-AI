@@ -4,6 +4,8 @@ and profile fetch. Separate from GitHubService (which browses public
 repos) because this one needs client credentials and handles a
 different kind of token.
 """
+from urllib.parse import urlencode
+
 import httpx
 
 from app.core.config import get_settings
@@ -18,12 +20,19 @@ class GitHubOAuthService:
         self._settings = get_settings()
         self._client = httpx.Client(timeout=15)
 
-    def authorize_url(self) -> str:
-        params = (
-            f"client_id={self._settings.github_oauth_client_id}"
-            f"&redirect_uri={self._settings.github_oauth_redirect_uri}"
-            f"&scope=read:user user:email"
-        )
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self._client.close()
+
+    def authorize_url(self, state: str) -> str:
+        params = urlencode({
+            "client_id": self._settings.github_oauth_client_id,
+            "redirect_uri": self._settings.github_oauth_redirect_uri,
+            "scope": "read:user user:email",
+            "state": state,
+        })
         return f"https://github.com/login/oauth/authorize?{params}"
 
     def exchange_code_for_token(self, code: str) -> str:
@@ -51,16 +60,12 @@ class GitHubOAuthService:
         user_resp.raise_for_status()
         user = user_resp.json()
 
-        email = user.get("email")
+        emails_resp = self._client.get("https://api.github.com/user/emails", headers=headers)
+        emails_resp.raise_for_status()
+        emails = [entry for entry in emails_resp.json() if entry.get("verified")]
+        primary = next((entry for entry in emails if entry.get("primary")), None)
+        email = (primary or (emails[0] if emails else {})).get("email")
         if not email:
-            # Primary email is often private - fall back to the emails endpoint.
-            emails_resp = self._client.get("https://api.github.com/user/emails", headers=headers)
-            emails_resp.raise_for_status()
-            emails = emails_resp.json()
-            primary = next((e for e in emails if e.get("primary")), None)
-            email = primary["email"] if primary else (emails[0]["email"] if emails else None)
-
-        if not email:
-            raise GitHubOAuthError("Couldn't get an email address from your GitHub account.")
+            raise GitHubOAuthError("GitHub sign-in requires a verified email address.")
 
         return {"id": str(user["id"]), "email": email, "login": user.get("login")}

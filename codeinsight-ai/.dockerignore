@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/.next
+**/out
+**/__pycache__
+**/*.tsbuildinfo
+**/.venv
+**/.scanner
+**/.env
+**/.env.local
+**/*.pem
+**/*.db

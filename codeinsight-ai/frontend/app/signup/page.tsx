@@ -46,7 +46,7 @@ export default function SignupPage() {
       <div className="relative w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2 font-display font-semibold tracking-tight">
           <Sparkles className="h-5 w-5 text-primary" />
-          CodeInsight AI
+          CodeGuard AI
         </Link>
         <Card className="shadow-2xl shadow-black/30">
           <CardContent className="p-6">

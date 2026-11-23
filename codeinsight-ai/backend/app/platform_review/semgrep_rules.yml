@@ -1,0 +1,31 @@
+rules:
+  - id: python-bare-except
+    languages: [python]
+    severity: WARNING
+    message: Catch a specific exception so unexpected failures propagate.
+    pattern: |
+      try:
+        ...
+      except:
+        ...
+  - id: python-mutable-default
+    languages: [python]
+    severity: WARNING
+    message: Initialize mutable defaults inside the function to avoid sharing state.
+    pattern-either:
+      - pattern: |
+          def $F(..., $ARG=[], ...):
+            ...
+      - pattern: |
+          def $F(..., $ARG={}, ...):
+            ...
+  - id: javascript-loose-equality
+    languages: [javascript, typescript]
+    severity: INFO
+    message: Consider strict equality to make type coercion explicit.
+    pattern: $A == $B
+  - id: python-shell-flag
+    languages: [python]
+    severity: ERROR
+    message: Pass an argument vector and leave the subprocess shell disabled.
+    pattern: subprocess.$FUNC(..., shell=True, ...)

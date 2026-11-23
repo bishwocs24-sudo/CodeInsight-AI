@@ -71,7 +71,7 @@ export default function GitHubPage() {
     <div>
       <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight">GitHub</h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        Connect a public repository, review files individually, or score the whole repo's health.
+        Connect a public repository, review files individually, or score the whole repo&rsquo;s health.
       </p>
 
       <form onSubmit={handleImport} className="mb-6 flex gap-2">

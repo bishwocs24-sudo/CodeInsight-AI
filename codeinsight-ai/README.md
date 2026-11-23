@@ -1,4 +1,8 @@
-# CodeInsight AI
+# CodeGuard AI
+
+The asynchronous review queue adds GitHub App pull request reviews, Semgrep, evidence-validated AI suggestions, feedback, SARIF export, and optional isolated Python tests. See [Review automation](docs/REVIEW_AUTOMATION.md) for startup, configuration, migrations, and verification. See [Render deployment](docs/RENDER_DEPLOYMENT.md) for the full hosted stack.
+
+Select **Try sample review** from the homepage to explore a recorded Semgrep scan, triage a finding, and download SARIF without an account. The replay uses a fixed snippet and runs entirely in the browser.
 
 AI-powered code review platform. Paste code, upload a file, or connect a
 public GitHub repo; run an AI review/security/refactor/test/explain/complexity
@@ -11,10 +15,7 @@ repo import + per-file review + repo health score, review history, analytics
 with charts, PDF/JSON export, a real settings page, diff viewer, copy buttons,
 autosave, and a keyboard shortcut (`Ctrl+Enter`).
 
-**Needs your own account/keys to enable** (not auto-wired, since only you
-can create these): user authentication (Clerk — see `docs/AUTH_SETUP.md`),
-production deployment (Vercel/Render/Neon — see `docs/DEPLOYMENT.md`).
-Nothing in the app is a stub — every button does exactly what it says.
+Password authentication is built in. GitHub App automation, GitHub sign-in, and Gemini reviews require their respective credentials. The [Render Blueprint](render.yaml) closes public registration by default.
 
 ## Architecture
 
@@ -57,7 +58,7 @@ can edit prompt wording in one file without touching request handling.
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - Python 3.11+
 - Docker (for Postgres) — or point `DATABASE_URL` at any Postgres instance
 - A Google AI Studio (Gemini) API key — free, no credit card: https://aistudio.google.com/apikey

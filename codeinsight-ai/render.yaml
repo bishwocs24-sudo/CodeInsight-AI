@@ -1,16 +1,92 @@
 services:
   - type: web
-    name: codeinsight-ai-backend
+    name: codeguard-web
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    preDeployCommand: alembic upgrade head
+    healthCheckPath: /ready
+    envVars:
+      - fromGroup: codeguard-runtime
+      - key: PRODUCTION
+        value: "true"
+      - key: SIGNUP_ENABLED
+        value: "false"
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: codeguard-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: codeguard-queue
+          property: connectionString
+
+  - type: worker
+    name: codeguard-worker
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: standard
+    region: singapore
+    maxShutdownDelaySeconds: 240
+    buildCommand: pip install -r requirements.txt && python -m venv .scanner && .scanner/bin/pip install -r requirements-scanner.txt
+    startCommand: celery -A app.platform_review.worker:celery worker --loglevel=INFO --concurrency=1
     envVars:
+      - fromGroup: codeguard-runtime
+      - key: PYTHON_VERSION
+        value: "3.12.14"
+      - key: SEMGREP_BINARY
+        value: .scanner/bin/semgrep
       - key: DATABASE_URL
-        sync: false
-      - key: GOOGLE_API_KEY
-        sync: false
-      - key: GOOGLE_MODEL
-        value: gemini-2.5-flash
-      - key: FRONTEND_ORIGIN
-        sync: false
+        fromDatabase:
+          name: codeguard-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: codeguard-queue
+          property: connectionString
+
+  - type: worker
+    name: codeguard-scheduler
+    runtime: python
+    rootDir: backend
+    plan: starter
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.platform_review.worker:celery beat --loglevel=INFO --schedule=/tmp/codeguard-beat
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.14"
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: codeguard-queue
+          property: connectionString
+
+  - type: keyvalue
+    name: codeguard-queue
+    plan: starter
+    region: singapore
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+
+databases:
+  - name: codeguard-postgres
+    plan: basic-256mb
+    region: singapore
+    ipAllowList: []
+
+envVarGroups:
+  - name: codeguard-runtime
+    envVars:
+      - key: SANDBOX_ENABLED
+        value: "false"
+      - key: PR_AI_ENABLED
+        value: "false"
+      - key: REVIEW_RETENTION_DAYS
+        value: "7"

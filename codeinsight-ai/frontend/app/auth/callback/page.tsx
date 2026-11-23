@@ -1,27 +1,26 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 function CallbackHandler() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { loginWithToken } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const token = new URLSearchParams(window.location.hash.slice(1)).get("token");
     if (!token) {
       setError("Missing token from GitHub sign-in.");
       return;
     }
     loginWithToken(token)
-      .then(() => router.push("/dashboard"))
+      .then(() => router.replace("/dashboard"))
       .catch(() => setError("Couldn't complete GitHub sign-in. Try again."));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   if (error) return <p className="text-sm text-red-400">{error}</p>;
   return (

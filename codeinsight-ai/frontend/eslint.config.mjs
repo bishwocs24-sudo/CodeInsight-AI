@@ -1,0 +1,13 @@
+import next from "eslint-config-next/core-web-vitals";
+
+const config = [
+  ...next,
+  { ignores: [".next/**", "next-env.d.ts"] },
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
+];
+
+export default config;

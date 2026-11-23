@@ -21,7 +21,7 @@ export default function HistoryPage() {
   return (
     <div>
       <h1 className="mb-1 font-display text-2xl font-semibold tracking-tight">History</h1>
-      <p className="mb-8 text-sm text-muted-foreground">Every review you've run.</p>
+      <p className="mb-8 text-sm text-muted-foreground">Every review you&rsquo;ve run.</p>
 
       {error && (
         <Card className="border-red-500/30">

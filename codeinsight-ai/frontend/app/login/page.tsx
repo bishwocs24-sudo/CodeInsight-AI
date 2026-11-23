@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Github, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
-import { ApiError } from "@/lib/api";
+import { ApiError, getAuthOptions, type AuthOptions } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -21,6 +21,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [options, setOptions] = useState<AuthOptions | null>(null);
+
+  useEffect(() => {
+    getAuthOptions().then(setOptions).catch(() => {});
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,20 +48,22 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm">
         <Link href="/" className="mb-8 flex items-center justify-center gap-2 font-display font-semibold tracking-tight">
           <Sparkles className="h-5 w-5 text-primary" />
-          CodeInsight AI
+          CodeGuard AI
         </Link>
         <Card className="shadow-2xl shadow-black/30">
           <CardContent className="p-6">
             <h1 className="mb-1 font-display text-lg font-semibold">Sign in</h1>
             <p className="mb-6 text-sm text-muted-foreground">Welcome back.</p>
-            <a href={`${API_URL}/auth/github/login`}>
-              <Button variant="outline" className="mb-4 w-full">
-                <Github className="h-4 w-4" /> Continue with GitHub
-              </Button>
-            </a>
-            <div className="mb-4 flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-            </div>
+            {options?.github && (
+              <>
+                <a href={`${API_URL}/auth/github/login`} className="queue-secondary mb-4 w-full">
+                  <Github className="h-4 w-4" aria-hidden /> Continue with GitHub
+                </a>
+                <div className="mb-4 flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
+                </div>
+              </>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs text-muted-foreground">Email</label>
@@ -84,12 +92,17 @@ export default function LoginPage() {
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
               </Button>
             </form>
-            <p className="mt-5 text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-foreground underline underline-offset-4">
-                Sign up
-              </Link>
-            </p>
+            {options?.signup && (
+              <p className="mt-5 text-center text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="text-foreground underline underline-offset-4">
+                  Sign up
+                </Link>
+              </p>
+            )}
+            <Link href="/demo" className="mt-4 block text-center text-sm text-teal-300 hover:underline">
+              Try sample review
+            </Link>
           </CardContent>
         </Card>
       </div>

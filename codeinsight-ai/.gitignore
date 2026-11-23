@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+*.tsbuildinfo
+.venv/
+.scanner/
+node_modules/
+.next/
+.env
+.env.local
+celerybeat-schedule*
+*.pem
+frontend/out/
