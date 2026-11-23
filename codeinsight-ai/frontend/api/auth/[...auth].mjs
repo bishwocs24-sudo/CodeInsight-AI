@@ -17,7 +17,8 @@ function getTrustedOrigin() {
 }
 
 const handler = {
-  async fetch(request: Request) {
+  /** @param {Request} request */
+  async fetch(request) {
     const url = new URL(request.url);
     const trustedOrigin = getTrustedOrigin();
     const secret = process.env.AUTH_SECRET;
