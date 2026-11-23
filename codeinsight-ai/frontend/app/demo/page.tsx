@@ -34,7 +34,7 @@ export default function DemoPage() {
     <main className="queue-workspace max-w-6xl px-5 py-6 sm:px-8">
       <nav className="mb-6 flex flex-wrap items-center justify-between gap-3" aria-label="Sample review">
         <Link className="queue-secondary" href="/"><ArrowLeft size={15} aria-hidden /> Home</Link>
-        {process.env.NEXT_PUBLIC_DEMO_ONLY !== "1" && <Link className="queue-secondary" href="/login">Sign in</Link>}
+        <Link className="queue-secondary" href="/login">Sign in</Link>
       </nav>
       <header className="queue-hero">
         <div>

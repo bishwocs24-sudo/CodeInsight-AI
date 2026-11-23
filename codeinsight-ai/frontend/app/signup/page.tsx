@@ -45,7 +45,7 @@ export default function SignupPage() {
       <main className="queue-workspace flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
         <h1 className="text-2xl font-semibold">CodeGuard sample demo</h1>
         <p className="text-sm text-slate-400">This deployment serves the public sample review.</p>
-        <Link href="/demo" className="queue-primary">Try sample review</Link>
+        <Link href="/login" className="queue-primary">Sign in with GitHub</Link>
       </main>
     );
   }

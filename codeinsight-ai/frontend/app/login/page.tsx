@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { ApiError, getAuthOptions, type AuthOptions } from "@/lib/api";
+import { HostedLogin } from "./hosted-login";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -43,15 +44,7 @@ export default function LoginPage() {
     }
   }
 
-  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") {
-    return (
-      <main className="queue-workspace flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
-        <h1 className="text-2xl font-semibold">CodeGuard sample demo</h1>
-        <p className="text-sm text-slate-400">This deployment serves the public sample review.</p>
-        <Link href="/demo" className="queue-primary">Try sample review</Link>
-      </main>
-    );
-  }
+  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") return <HostedLogin />;
 
   return (
     <main className="relative flex min-h-screen items-center justify-center px-6">

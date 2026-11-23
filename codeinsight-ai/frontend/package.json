@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth/core": "0.41.3",
     "@monaco-editor/react": "4.7.0",
     "@tanstack/react-query": "5.56.2",
     "clsx": "2.1.1",
