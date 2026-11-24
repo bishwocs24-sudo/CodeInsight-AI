@@ -4,7 +4,7 @@ import GitHub from "@auth/core/providers/github";
 const basePath = "/api/auth";
 
 function getTrustedOrigin() {
-  const url = process.env.AUTH_URL
+  const url = process.env.AUTH_URL?.trim()
     ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "");
@@ -21,9 +21,9 @@ const handler = {
   async fetch(request) {
     const url = new URL(request.url);
     const trustedOrigin = getTrustedOrigin();
-    const secret = process.env.AUTH_SECRET;
-    const clientId = process.env.AUTH_GITHUB_ID;
-    const clientSecret = process.env.AUTH_GITHUB_SECRET;
+    const secret = process.env.AUTH_SECRET?.trim();
+    const clientId = process.env.AUTH_GITHUB_ID?.trim();
+    const clientSecret = process.env.AUTH_GITHUB_SECRET?.trim();
 
     if (url.origin !== trustedOrigin || !secret || secret.length < 32 || !clientId || !clientSecret) {
       const readable = request.method === "GET"
