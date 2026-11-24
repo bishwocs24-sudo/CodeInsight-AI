@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Github, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 type User = { name?: string | null; email?: string | null };
 type LoginStatus = "loading" | "ready" | "unavailable";
@@ -23,15 +23,15 @@ export function HostedLogin() {
   useEffect(() => {
     let mounted = true;
     if (new URLSearchParams(window.location.search).has("error")) {
-      setError("GitHub sign-in could not be completed. Try again.");
+      setError("Google sign-in could not be completed. Try again.");
     }
 
     Promise.all([
-      getJson<{ github?: unknown }>("providers"),
+      getJson<{ google?: unknown }>("providers"),
       getJson<{ user?: User } | null>("session"),
     ]).then(([providers, session]) => {
       if (!mounted) return;
-      setStatus(providers.github ? "ready" : "unavailable");
+      setStatus(providers.google ? "ready" : "unavailable");
       setUser(session?.user ?? null);
     }).catch(() => {
       if (mounted) setStatus("unavailable");
@@ -39,7 +39,7 @@ export function HostedLogin() {
     return () => { mounted = false; };
   }, []);
 
-  async function submit(action: "signin/github" | "signout") {
+  async function submit(action: "signin/google" | "signout") {
     setBusy(true);
     setError("");
     try {
@@ -48,7 +48,7 @@ export function HostedLogin() {
       const form = document.createElement("form");
       form.method = "post";
       form.action = `${authPath}/${action}`;
-      for (const [name, value] of Object.entries({ csrfToken, callbackUrl: "/login/" })) {
+      for (const [name, value] of Object.entries({ csrfToken, callbackUrl: action === "signout" ? "/login/" : "/workspace/" })) {
         const input = document.createElement("input");
         input.type = "hidden";
         input.name = name;
@@ -58,7 +58,7 @@ export function HostedLogin() {
       document.body.appendChild(form);
       form.submit();
     } catch {
-      setError("Could not connect to GitHub sign-in. Try again.");
+      setError("Could not connect to Google sign-in. Try again.");
       setBusy(false);
     }
   }
@@ -72,7 +72,8 @@ export function HostedLogin() {
         <h1>{user ? "Your account" : "Sign in to CodeGuard"}</h1>
         {user ? (
           <>
-            <p>Signed in with GitHub as {user.name || user.email || "a GitHub user"}.</p>
+            <p>Signed in with Google as {user.name || user.email || "a Google user"}.</p>
+            <Link className="queue-primary mt-5 w-fit" href="/workspace/">Open review workspace</Link>
             <button className="queue-secondary mt-5" type="button" disabled={busy}
               onClick={() => submit("signout")}>
               {busy ? "Signing out…" : "Sign out"}
@@ -80,14 +81,14 @@ export function HostedLogin() {
           </>
         ) : (
           <>
-            <p>Use your GitHub account to sign in. You can scan code without an account.</p>
+            <p>Sign in to scan files and save review reports in your Google Drive app storage.</p>
             <button className="queue-primary mt-5" type="button" disabled={status !== "ready" || busy}
-              onClick={() => submit("signin/github")}>
-              <Github size={17} aria-hidden /> {busy ? "Opening GitHub…" : "Continue with GitHub"}
+              onClick={() => submit("signin/google")}>
+              {busy ? "Opening Google…" : "Continue with Google"}
             </button>
             <p role="status">
-              {status === "loading" && "Checking GitHub sign-in…"}
-              {status === "unavailable" && "GitHub sign-in is unavailable until the deployment is configured."}
+              {status === "loading" && "Checking Google sign-in…"}
+              {status === "unavailable" && "Google sign-in is unavailable until the deployment is configured."}
             </p>
           </>
         )}

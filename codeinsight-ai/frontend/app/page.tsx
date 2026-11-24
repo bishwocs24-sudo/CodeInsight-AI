@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { Braces, GitPullRequest, ScanLine, ShieldCheck } from "lucide-react";
 
+const hosted = process.env.NEXT_PUBLIC_DEMO_ONLY === "1";
 const workflow = [
   {
     icon: GitPullRequest,
     title: "Review changes",
-    body: "Queue a snippet scan or configure a GitHub App to review added lines at a specific commit.",
+    body: hosted ? "Paste code or upload a Python, JavaScript, TypeScript, C, or C++ file." : "Queue a snippet scan or configure a GitHub App to review added lines at a specific commit.",
   },
   {
     icon: ScanLine,
     title: "Inspect the evidence",
-    body: "See which lines Semgrep and the built-in analyzer flagged. If Gemini is enabled, AI suggestions must cite an exact changed line.",
+    body: hosted ? "Open the exact line behind a finding and record your review decision." : "See which lines Semgrep and the built-in analyzer flagged. If Gemini is enabled, AI suggestions must cite an exact changed line.",
   },
   {
     icon: Braces,
     title: "Triage and export",
-    body: "Mark findings as confirmed or false positives, then export the review as SARIF.",
+    body: hosted ? "Save reviewed findings to your Google account, search past reports, or download SARIF." : "Mark findings as confirmed or false positives, then export the review as SARIF.",
   },
 ];
 
@@ -26,7 +27,7 @@ export default function LandingPage() {
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <ShieldCheck className="text-teal-300" size={21} aria-hidden /> CodeGuard AI
         </Link>
-        <Link href="/login" className="queue-secondary">Sign in</Link>
+        <Link href={hosted ? "/workspace/" : "/login"} className="queue-secondary">{hosted ? "My workspace" : "Sign in"}</Link>
       </nav>
 
       <section className="release-hero mt-8 rounded-2xl border">
@@ -45,7 +46,7 @@ export default function LandingPage() {
         <aside className="queue-panel min-w-0 p-5" aria-label="Example of a review finding">
           <div className="flex flex-wrap items-center gap-2">
             <span className="queue-severity severity-medium">Medium</span>
-            <span className="queue-source">Semgrep</span>
+            <span className="queue-source">{hosted ? "Python · PY005" : "Semgrep"}</span>
           </div>
           <p className="mt-4 text-lg font-medium">Mutable default argument</p>
           <pre className="mt-3 overflow-x-auto rounded-md bg-slate-950 p-3 text-xs text-teal-200"><code>def add_label(label, labels=[]):</code></pre>

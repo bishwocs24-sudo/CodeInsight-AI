@@ -36,12 +36,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading } = useAuth();
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") {
+      router.replace("/workspace/");
+      return;
+    }
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
-  if (loading || !user) {
+  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1" || loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
