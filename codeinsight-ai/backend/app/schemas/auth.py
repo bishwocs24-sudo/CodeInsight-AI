@@ -8,6 +8,10 @@ class SignupRequest(BaseModel):
     password: str = Field(min_length=8, max_length=100)
 
 
+class GoogleExchangeRequest(BaseModel):
+    id_token: str = Field(min_length=1, max_length=16384)
+
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str

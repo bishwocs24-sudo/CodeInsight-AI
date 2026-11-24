@@ -26,7 +26,7 @@ export default function LoginPage() {
   const [options, setOptions] = useState<AuthOptions | null>(null);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") return;
+    if (process.env.NEXT_PUBLIC_HOSTED_GOOGLE === "1") return;
     getAuthOptions().then(setOptions).catch(() => {});
   }, []);
 
@@ -44,7 +44,7 @@ export default function LoginPage() {
     }
   }
 
-  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") return <HostedLogin />;
+  if (process.env.NEXT_PUBLIC_HOSTED_GOOGLE === "1") return <HostedLogin />;
 
   return (
     <main className="relative flex min-h-screen items-center justify-center px-6">

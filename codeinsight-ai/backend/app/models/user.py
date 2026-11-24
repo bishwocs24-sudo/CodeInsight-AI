@@ -18,6 +18,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     # Nullable because GitHub-OAuth users never set a password.
     hashed_password: Mapped[str | None] = mapped_column(String, nullable=True)
+    google_subject: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     github_id: Mapped[str | None] = mapped_column(String, unique=True, index=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)

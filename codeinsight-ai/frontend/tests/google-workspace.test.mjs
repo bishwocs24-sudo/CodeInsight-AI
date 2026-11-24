@@ -52,3 +52,24 @@ test("saves a valid report into the user's app folder", async (t) => {
   const request = await signedRequest({method: "POST", headers: {origin, "content-type":"application/json"}, body: JSON.stringify(report)});
   assert.deepEqual(await (await reviews.fetch(request)).json(), {id: "report1"});
 });
+
+test("worker dashboard exchange requires a Google identity and a same-origin POST", async (t) => {
+  const { default: platform } = await import("../api/platform-session.mjs");
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    assert.equal(String(url), "https://backend.example/auth/google/exchange");
+    assert.equal(JSON.parse(options.body).id_token, "mock-identity");
+    assert.equal(options.redirect, "error");
+    return Response.json({ access_token: "temporary-platform-token" });
+  });
+  process.env.NEXT_PUBLIC_API_URL = "https://backend.example";
+  try {
+    assert.equal((await platform.fetch(await signedRequest({ method: "POST" }))).status, 403);
+    assert.equal((await platform.fetch(await signedRequest({ method: "POST", headers: { origin } }))).status, 401);
+    const salt = "__Secure-authjs.session-token";
+    const encrypted = await encode({ salt, secret, token: { googleIdentity: "mock-identity", googleExpires: Math.floor(Date.now()/1000) + 60 } });
+    const response = await platform.fetch(new Request(origin + "/api/platform-session", {
+      method: "POST", headers: { origin, cookie: salt + "=" + encrypted },
+    }));
+    assert.equal((await response.json()).access_token, "temporary-platform-token");
+  } finally { delete process.env.NEXT_PUBLIC_API_URL; }
+});

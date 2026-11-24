@@ -48,6 +48,7 @@ const handler = {
         signIn({ profile }) { return profile?.email_verified === true; },
         jwt({ token, account }) {
           if (account?.provider === "google") {
+            if (process.env.NEXT_PUBLIC_API_URL) token.googleIdentity = account.id_token;
             token.googleAccess = account.access_token;
             token.googleExpires = account.expires_at;
           }

@@ -2,10 +2,30 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 import { Scanner } from "../scan/scanner";
 
 export default function Workspace() {
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const { loginWithToken } = useAuth();
+  const router = useRouter();
+  const [platformError, setPlatformError] = useState("");
+  const [opening, setOpening] = useState(false);
+  async function openDashboard() {
+    setOpening(true);
+    setPlatformError("");
+    try {
+      const response = await fetch("/api/platform-session", { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not open the dashboard.");
+      await loginWithToken(result.access_token);
+      router.push("/dashboard/");
+    } catch (error) {
+      setPlatformError(error instanceof Error ? error.message : "Could not reach the review backend.");
+      setOpening(false);
+    }
+  }
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -19,7 +39,13 @@ export default function Workspace() {
       .catch(() => { if (!controller.signal.aborted) setFailed(true); });
     return () => controller.abort();
   }, []);
-  if (user) return <Scanner workspaceUser={user} />;
+  if (user) return <>
+    {process.env.NEXT_PUBLIC_API_URL && <section className="queue-workspace scanner-shell px-5 pt-4 sm:px-8">
+      <button className="queue-primary" disabled={opening} onClick={openDashboard}>{opening ? "Opening dashboard…" : "Open full review dashboard"}</button>
+      {platformError && <p role="alert" className="mt-2 text-rose-300">{platformError}</p>}
+    </section>}
+    <Scanner workspaceUser={user} />
+  </>;
   return <main className="queue-workspace scanner-shell p-8">
     <h1 className="text-3xl font-semibold">Review workspace</h1>
     <p className="my-4" role="status">{failed ? "Could not check your session." : "Checking your session…"}</p>

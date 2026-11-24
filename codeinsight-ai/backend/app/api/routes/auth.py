@@ -1,4 +1,5 @@
 import secrets
+import time
 from urllib.parse import urlencode
 
 import httpx
@@ -13,7 +14,8 @@ from app.core.config import get_settings
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.database import get_db
 from app.models.user import User
-from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse, UserResponse
+from app.services.google_identity import verify_identity
+from app.schemas.auth import GoogleExchangeRequest, LoginRequest, SignupRequest, TokenResponse, UserResponse
 from app.services.github_oauth_service import GitHubOAuthError, GitHubOAuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -123,3 +125,24 @@ def github_callback(request: Request, code: str, state: str, db: Session = Depen
     )
     response.delete_cookie("codeguard_oauth_state", path="/auth/github/callback")
     return response
+
+
+@router.post("/google/exchange", response_model=TokenResponse, dependencies=[Depends(limit_auth)])
+def google_exchange(payload: GoogleExchangeRequest, db: Session = Depends(get_db)):
+    claims = verify_identity(payload.id_token)
+    user = db.query(User).filter(User.google_subject == claims["sub"]).first()
+    if user is None:
+        if not get_settings().signup_enabled:
+            raise HTTPException(403, "Account registration is closed")
+        user = User(email=claims["email"], google_subject=claims["sub"])
+        db.add(user)
+        try:
+            db.commit()
+        except IntegrityError as exc:
+            db.rollback()
+            user = db.query(User).filter(User.google_subject == claims["sub"]).first()
+            if user is None:
+                raise HTTPException(409, "This email already belongs to another account") from exc
+    expires = min(int(claims["exp"]), int(time.time()) + 45 * 60)
+    return TokenResponse(access_token=create_access_token(user.id, expires_at=expires),
+                         user=UserResponse.model_validate(user))

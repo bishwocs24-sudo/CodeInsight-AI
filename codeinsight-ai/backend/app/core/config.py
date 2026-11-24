@@ -14,6 +14,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     database_url: str = "postgresql://codeinsight:codeinsight@localhost:5432/codeinsight"
 
+    auth_google_id: str = ""
     google_api_key: str = ""
     google_model: str = "gemini-flash-latest"
 

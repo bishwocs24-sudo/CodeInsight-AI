@@ -40,7 +40,7 @@ export default function SignupPage() {
     }
   }
 
-  if (process.env.NEXT_PUBLIC_DEMO_ONLY === "1") {
+  if (process.env.NEXT_PUBLIC_HOSTED_GOOGLE === "1") {
     return (
       <main className="queue-workspace flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
         <h1 className="text-2xl font-semibold">Create your CodeGuard workspace</h1>

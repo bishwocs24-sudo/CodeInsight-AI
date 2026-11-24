@@ -23,7 +23,7 @@ export function UserMenu({ email }: { email: string }) {
   function handleLogout() {
     setOpen(false);
     logout();
-    router.push("/");
+    router.push(process.env.NEXT_PUBLIC_HOSTED_GOOGLE === "1" ? "/login/" : "/");
   }
 
   return (
@@ -61,7 +61,7 @@ export function UserMenu({ email }: { email: string }) {
               onClick={handleLogout}
               className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-red-400 hover:bg-red-500/10"
             >
-              <LogOut className="h-4 w-4" /> Sign out
+              <LogOut className="h-4 w-4" /> {process.env.NEXT_PUBLIC_HOSTED_GOOGLE === "1" ? "Account and sign out" : "Sign out"}
             </button>
           </nav>
         </div>

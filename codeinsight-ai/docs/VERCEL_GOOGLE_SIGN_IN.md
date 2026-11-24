@@ -10,3 +10,9 @@ The hosted site signs in with Google at `/login/` and opens `/workspace/` after 
 Reports are stored as individual snapshots in the user's Google Drive application data folder when the user chooses Save report. They include the filename, diagnostics, dispositions and relevant source excerpts. Scanning does not store the full input file. Server-side requests use the access token in the encrypted session. When authorization expires, sign in again.
 
 Run hosted workspace checks from the frontend directory with `node --test tests/google-workspace.test.mjs`. Background Semgrep and PR automation use the separate worker stack described in REVIEW_AUTOMATION.md.
+
+## Full worker-backed dashboard
+
+Apply Alembic migrations on the FastAPI deployment. Set its AUTH_GOOGLE_ID to the same web client ID and its FRONTEND_ORIGIN to the Vercel HTTPS origin. Account registration must be open to provision new Google users (SIGNUP_ENABLED=true). Existing accounts are never linked merely by matching email addresses.
+
+Set NEXT_PUBLIC_API_URL on Vercel to the HTTPS backend origin and redeploy. The workspace then offers **Open full review dashboard**. The backend verifies Google's signed ID token, audience, issuer, expiry, and verified email before issuing a short-lived platform session. PostgreSQL, Redis and the scan worker are required for queued reviews. Configure the GitHub App, Gemini, and the isolated runner separately for their respective features.

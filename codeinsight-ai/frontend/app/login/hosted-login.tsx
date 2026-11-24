@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { clearToken } from "@/lib/api";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
@@ -56,6 +57,7 @@ export function HostedLogin() {
         form.appendChild(input);
       }
       document.body.appendChild(form);
+      if (action === "signout") clearToken();
       form.submit();
     } catch {
       setError("Could not connect to Google sign-in. Try again.");

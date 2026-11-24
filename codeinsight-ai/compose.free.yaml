@@ -2,7 +2,8 @@ name: codeguard-free
 
 x-runtime: &runtime
   PRODUCTION: "true"
-  SIGNUP_ENABLED: "false"
+  SIGNUP_ENABLED: "${SIGNUP_ENABLED:-false}"
+  AUTH_GOOGLE_ID: "${AUTH_GOOGLE_ID:-}"
   SANDBOX_ENABLED: "false"
   PR_AI_ENABLED: "${PR_AI_ENABLED:-false}"
   GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
@@ -14,7 +15,7 @@ x-runtime: &runtime
   GITHUB_ALLOWED_INSTALLATIONS: "${GITHUB_ALLOWED_INSTALLATIONS:-}"
   GITHUB_PUBLISH_REVIEWS: "${GITHUB_PUBLISH_REVIEWS:-false}"
   JWT_SECRET_KEY: "${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in deploy/free.env}"
-  FRONTEND_ORIGIN: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME in deploy/free.env}"
+  FRONTEND_ORIGIN: "${FRONTEND_ORIGIN:-https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME in deploy/free.env}}"
   FRONTEND_AUTH_CALLBACK_URL: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME}/auth/callback"
   GITHUB_OAUTH_REDIRECT_URI: "https://${PUBLIC_HOSTNAME:?Set PUBLIC_HOSTNAME}/auth/github/callback"
   DATABASE_URL: "postgresql://codeguard:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/free.env}@db:5432/codeguard"
