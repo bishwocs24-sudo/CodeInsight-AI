@@ -1,6 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "VERCEL=1 CODEGUARD_STATIC_EXPORT=1 npm run build",
-  "outputDirectory": "out"
+  "framework": "nextjs",
+  "buildCommand": "CODEGUARD_STATIC_EXPORT=1 npm run build",
+  "outputDirectory": "out",
+  "functions": {
+    "api/scan.py": {
+      "includeFiles": "lib/hosted_python/static_analysis.py",
+      "maxDuration": 10
+    }
+  }
 }

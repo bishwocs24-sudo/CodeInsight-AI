@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Braces, GitPullRequest, ScanLine, ShieldCheck } from "lucide-react";
+import { Braces, GitPullRequest, ScanLine, ShieldCheck } from "lucide-react";
 
 const workflow = [
   {
@@ -35,12 +35,12 @@ export default function LandingPage() {
             Code reviews with line-level evidence
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-300">
-            Scan snippets and GitHub pull requests with Semgrep, built-in static checks, and optional AI suggestions.
+            Scan source code for security and reliability issues, inspect the affected lines, and export the results.
           </p>
-          <Link href="/demo" className="queue-primary mt-7 w-fit">
-            Try sample review <ArrowRight size={17} aria-hidden />
-          </Link>
-          <p className="mt-3 text-sm text-slate-400">No account required for the sample.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href={process.env.NEXT_PUBLIC_DEMO_ONLY === "1" ? "/scan" : "/dashboard/review-queue"} className="queue-primary">Start a code scan</Link>
+            <Link href="/demo" className="queue-secondary">Explore a sample review</Link>
+          </div>
         </div>
         <aside className="queue-panel min-w-0 p-5" aria-label="Example of a review finding">
           <div className="flex flex-wrap items-center gap-2">

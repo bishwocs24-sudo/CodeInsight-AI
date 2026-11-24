@@ -149,3 +149,9 @@ select:focus-visible,
 .demo-source li[data-selected="true"] { background: #1c373c; box-shadow: inset 3px 0 #7be5c6; }
 
 @media (max-width: 820px) { .release-hero { grid-template-columns: minmax(0, 1fr); } }
+
+.queue-workspace.scanner-shell { max-width: 78rem; }
+.scanner-grid { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: 1.25rem; }
+.scanner-panel-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .9rem 1.15rem; border-bottom: 1px solid #263648; }
+.scanner-editor { display: block; width: 100%; min-height: 19rem; resize: vertical; border: 1px solid #334155; border-radius: .55rem; padding: 1rem; background: #080e18; color: #e2e8f0; font: .875rem/1.7 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 4; }
+@media (max-width: 850px) { .scanner-grid { grid-template-columns: minmax(0, 1fr); } .scanner-editor { min-height: 14rem; } }

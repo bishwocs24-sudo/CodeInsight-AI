@@ -19,3 +19,11 @@ Generate a client secret. In Vercel, open the `codeguard-ai-demo` project's Envi
 | `AUTH_URL` | `https://codeguard-ai-demo.vercel.app` |
 
 Store the secret values directly in Vercel. Redeploy the updated commit to Production, open `/login/`, choose **Continue with GitHub**, and confirm the account page and sign-out work. The demo leaves sign-in disabled when any required credentials are missing and restricts the OAuth flow to the configured origin.
+
+## Public snippet scanning
+
+The Vercel build includes a live scanner at `/scan/`. It accepts pasted snippets and UTF-8 files up to 24 KB and returns line evidence from built-in rules. No account, provider key, database, or worker is required for this scanner. Submitted code is analyzed without execution, and results can be downloaded as SARIF.
+
+The Vercel function packages a copy of the dependency-free backend analyzer because the Vercel project root is the frontend directory. If you change `backend/app/services/static_analysis.py`, copy it to `frontend/lib/hosted_python/static_analysis.py` before deploying. The hosted scan tests check that the copies match.
+
+See [Free deployment](FREE_DEPLOYMENT.md) to run the full background worker, Semgrep, PR automation, and persistent review history.

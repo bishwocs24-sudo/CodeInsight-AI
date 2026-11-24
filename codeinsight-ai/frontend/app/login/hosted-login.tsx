@@ -80,7 +80,7 @@ export function HostedLogin() {
           </>
         ) : (
           <>
-            <p>Use your GitHub account to sign in.</p>
+            <p>Use your GitHub account to sign in. You can scan code without an account.</p>
             <button className="queue-primary mt-5" type="button" disabled={status !== "ready" || busy}
               onClick={() => submit("signin/github")}>
               <Github size={17} aria-hidden /> {busy ? "Opening GitHub…" : "Continue with GitHub"}
@@ -93,7 +93,7 @@ export function HostedLogin() {
         )}
         {error && <p role="alert" className="!text-rose-300">{error}</p>}
       </section>
-      <Link className="queue-link w-fit text-sm" href="/demo">Open the public sample review</Link>
+      <Link className="queue-link w-fit text-sm" href="/scan">Open the live code scanner</Link>
     </main>
   );
 }
